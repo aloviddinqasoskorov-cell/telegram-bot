@@ -11,9 +11,9 @@ ISM, TELEFON = range(2)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     tugmalar = [
-        [InlineKeyboardButton("Narxlar", callback_data="narx")],
-        [InlineKeyboardButton("Aloqa", callback_data="aloqa")],
-        [InlineKeyboardButton("Buyurtma", callback_data="buyurtma")],
+        [InlineKeyboardButton("💰 Narxlar", callback_data="narx")],
+        [InlineKeyboardButton("📞 Aloqa", callback_data="aloqa")],
+        [InlineKeyboardButton("🛒 Buyurtma", callback_data="buyurtma")],
     ]
     await update.message.reply_text("Salom!", reply_markup=InlineKeyboardMarkup(tugmalar))
 
@@ -21,24 +21,24 @@ async def tugma(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     if query.data == "narx":
-        await query.edit_message_text("Narx: 500,000 som")
+        await query.edit_message_text("💰 Narx: 500,000 som")
     elif query.data == "aloqa":
-        await query.edit_message_text("Aloqa: @Abdumuminovsalohiddin")
+        await query.edit_message_text("📞 Aloqa: @Abdumuminovsalohiddin")
     elif query.data == "buyurtma":
-        await query.edit_message_text("Ismingizni yozing:")
+        await query.edit_message_text("🛒 Ismingizni yozing:")
         return ISM
 
 async def ism_olish(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["ism"] = update.message.text
-    await update.message.reply_text("Telefon yozing:")
+    await update.message.reply_text("📱 Telefon yozing:")
     return TELEFON
 
 async def telefon_olish(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        await context.bot.send_message(chat_id=ADMIN_ID, text=f"Buyurtma!\nIsm: {context.user_data['ism']}\nTel: {update.message.text}")
+        await context.bot.send_message(chat_id=ADMIN_ID, text=f"🛒 Buyurtma!\n👤 Ism: {context.user_data['ism']}\n📞 Tel: {update.message.text}")
     except Exception as e:
         logging.error(e)
-    await update.message.reply_text("Qabul qilindi!")
+    await update.message.reply_text("✅ Qabul qilindi!")
     return ConversationHandler.END
 
 app = Application.builder().token(BOT_TOKEN).build()
