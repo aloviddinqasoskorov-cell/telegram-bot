@@ -15,41 +15,49 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("📞 Aloqa", callback_data="aloqa")],
         [InlineKeyboardButton("🛒 Buyurtma", callback_data="buyurtma")],
     ]
-    await update.message.reply_text("Salom!", reply_markup=InlineKeyboardMarkup(tugmalar))
+    await update.message.reply_text("Salom! Quyidagilardan birini tanlang:", reply_markup=InlineKeyboardMarkup(tugmalar))
 
-async def tugma(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def narx(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    if query.data == "narx":
-        await query.edit_message_text("💰 Narx: 500,000 som")
-    elif query.data == "aloqa":
-        await query.edit_message_text("📞 Aloqa: @Abdumuminovsalohiddin")
-    elif query.data == "buyurtma":
-        await query.edit_message_text("🛒 Ismingizni yozing:")
-        return ISM
+    await query.edit_message_text("💰 Narx: 100,000 so'mdan")
+
+async def aloqa(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("📞 Aloqa: @Abdumuminovsalohiddin")
+
+async def buyurtma_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("🛒 Ismingizni yozing:")
+    return ISM
 
 async def ism_olish(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["ism"] = update.message.text
-    await update.message.reply_text("📱 Telefon yozing:")
+    await update.message.reply_text("📱 Telefon raqamingizni yozing:")
     return TELEFON
 
 async def telefon_olish(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        await context.bot.send_message(chat_id=ADMIN_ID, text=f"🛒 Buyurtma!\n👤 Ism: {context.user_data['ism']}\n📞 Tel: {update.message.text}")
+        await context.bot.send_message(chat_id=ADMIN_ID, text=f"🛒 Yangi buyurtma!\n👤 Ism: {context.user_data['ism']}\n📞 Tel: {update.message.text}")
     except Exception as e:
         logging.error(e)
-    await update.message.reply_text("✅ Qabul qilindi!")
+    await update.message.reply_text("✅ Buyurtmangiz qabul qilindi!")
     return ConversationHandler.END
 
-app = Application.builder().token(BOT_TOKEN).build()
 conv = ConversationHandler(
-    entry_points=[CallbackQueryHandler(tugma)],
+    entry_points=[CallbackQueryHandler(buyurtma_start, pattern="^buyurtma$")],
     states={
         ISM: [MessageHandler(filters.TEXT & ~filters.COMMAND, ism_olish)],
         TELEFON: [MessageHandler(filters.TEXT & ~filters.COMMAND, telefon_olish)],
     },
     fallbacks=[CommandHandler("start", start)],
 )
+
+app = Application.builder().token(BOT_TOKEN).build()
 app.add_handler(CommandHandler("start", start))
+app.add_handler(CallbackQueryHandler(narx, pattern="^narx$"))
+app.add_handler(CallbackQueryHandler(aloqa, pattern="^aloqa$"))
 app.add_handler(conv)
 app.run_polling()
